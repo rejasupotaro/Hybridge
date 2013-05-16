@@ -92,6 +92,14 @@ public class HybridgeWebView extends WebView {
         super.setWebViewClient(new WebViewClientProxy(this, webViewClient, allowingDomains));
     }
 
+    public boolean browserBack() {
+        if (canGoBack()) {
+            goBack();
+            return true;
+        }
+        return false;
+    }
+    
     public void call(String jsMethodName, String... args) {
         call(null, jsMethodName, args);
     }
