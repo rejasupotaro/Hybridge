@@ -12,7 +12,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-
 import android.os.Handler;
 import android.util.Log;
 

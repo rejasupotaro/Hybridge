@@ -4,6 +4,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.database.sqlite.SQLiteStatement;
 import android.util.Log;
 
 import com.rejasupotaro.hybridge.utils.SQLiteUtils;
@@ -13,12 +14,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String DB_NAME = "hybridge_webview_cache";
     public static final String TABLE_NAME = "prefetched_contents";
     private static final int DB_VERSION = 1;
-    private static final String QUERY_CREATE_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + "(" +
+    private static final String QUERY_CREATE_TABLE = "CREATE TABLE " + TABLE_NAME + "(" +
             "_id INTEGER PRIMARY KEY," +
             "url TEXT," +
             "base_url TEXT," +
-            "content TEXT" +
-            "lastmodify TEXT," +
+            "content TEXT," +
             "expires INTEGER," +
             "mimetype TEXT," +
             "encoding TEXT," +
@@ -67,7 +67,20 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public void savePreloadContent(String url, String content) {
         String baseUrl = UriUtils.buildBaseUrl(url);
-        Log.d("DEBUG", baseUrl);
+
+        SQLiteDatabase db = getWritableDatabase();
+        SQLiteStatement statement = db.compileStatement(
+                "INSERT INTO " + TABLE_NAME + "(url, base_url, content, expires, mimetype, encoding) " +
+                "values (?, ?, ?, ?, ?, ?);");
+
+        statement.bindString(1, url);
+        statement.bindString(2, baseUrl);
+        statement.bindString(3, content);
+        statement.bindLong(4, System.currentTimeMillis());
+        statement.bindString(5, "text/html");
+        statement.bindString(6, "utf-8");
+
+        statement.executeInsert();
     }
 
     public Cursor getAllContents() {

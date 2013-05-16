@@ -16,7 +16,6 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import com.rejasupotaro.hybridge.R;
-import com.rejasupotaro.hybridge.R.styleable;
 import com.rejasupotaro.hybridge.annotation.Bridge;
 
 public class HybridgeWebView extends WebView {
