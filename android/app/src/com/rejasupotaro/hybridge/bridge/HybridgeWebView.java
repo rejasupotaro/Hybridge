@@ -92,7 +92,7 @@ public class HybridgeWebView extends WebView {
 
     @Override
     public void setWebViewClient(WebViewClient webViewClient) {
-        super.setWebViewClient(new WebViewClientProxy(webViewClient, allowingDomains));
+        super.setWebViewClient(new WebViewClientProxy(this, webViewClient, allowingDomains));
     }
 
     public void call(String jsMethodName, String... args) {

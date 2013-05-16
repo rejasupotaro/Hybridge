@@ -1,5 +1,7 @@
 package com.rejasupotaro.hybridge.bridge;
 
+import java.util.Map;
+
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.net.http.SslError;
@@ -10,14 +12,17 @@ import android.webkit.SslErrorHandler;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import com.rejasupotaro.hybridge.db.DbCache;
+import com.rejasupotaro.hybridge.db.entity.CacheContent;
 import com.rejasupotaro.hybridge.utils.UriUtils;
 
 public class WebViewClientProxy extends WebViewClient {
-
+    private HybridgeWebView webView;
     private WebViewClient webViewClient;
     private String[] allowingDomains;
 
-    public WebViewClientProxy(WebViewClient webViewClient, String[] allowingDomains) {
+    public WebViewClientProxy(HybridgeWebView webView, WebViewClient webViewClient, String[] allowingDomains) {
+        this.webView = webView;
         this.webViewClient = webViewClient;
         this.allowingDomains = allowingDomains;
     }
@@ -27,14 +32,29 @@ public class WebViewClientProxy extends WebViewClient {
     }
 
     public void onPageStarted(WebView view, String url, Bitmap favicon) {
-        webViewClient.onPageStarted(view, url, favicon);
         Uri uri = Uri.parse(url);
-        for (String domain : allowingDomains) {
-            if (UriUtils.compareDomain(uri, domain))
-                return;
-        }
 
-        throw new SecurityException("cannot load " + url);
+        for (String allowingDomain : allowingDomains) {
+            if (!UriUtils.compareDomain(uri, allowingDomain)) {
+                throw new SecurityException("cannot load " + url); // FIXME define specific error
+            }
+            Map<String, CacheContent> cacheMap = DbCache.getContentMap();
+            if (cacheMap.containsKey(url)) {
+                CacheContent cacheContent = cacheMap.get(url);
+                loadFromCache(webView, cacheContent, url);
+            } else {
+                webView.loadUrl(url);
+            }
+        }
+    }
+
+    private void loadFromCache(WebView webView, CacheContent cacheContent, String failUrl) {
+        webView.loadDataWithBaseURL(
+                cacheContent.getBaseUrl(),
+                cacheContent.getContent(),
+                cacheContent.getMimetype(),
+                cacheContent.getEncoding(),
+                failUrl);
     }
 
     public void onPageFinished(WebView view, String url) {

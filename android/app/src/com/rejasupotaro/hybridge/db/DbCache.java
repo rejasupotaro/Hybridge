@@ -35,16 +35,20 @@ public class DbCache {
 
         sIsInitialized = true;
     }
+    
+    public static Map<String, CacheContent> getContentMap() {
+        return sCacheMap;
+    }
 
     private static synchronized void loadPreloadContents() {
         Cursor c = null;
         try {
             c = sDatabaseHelper.getAllContents();
             if (c.moveToFirst()) {
-                do{
+                do {
                     CacheContent cacheContent = new CacheContent(c);
                     sCacheMap.put(cacheContent.getUrl(), cacheContent);
-                }while(c.moveToNext());
+                } while (c.moveToNext());
             }
         } finally {
             CloseableUtils.close(c);

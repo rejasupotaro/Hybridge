@@ -47,7 +47,7 @@ public class CacheContent {
         if (sTableName != null) return sTableName;
 
         Table table = (Table) CacheContent.class.getAnnotation(Table.class);
-        if (table == null) throw new RuntimeException("FIXME"); // FIXME
+        if (table == null) throw new RuntimeException("FIXME"); // FIXME define specific exception
 
         sTableName = table.value();
         return sTableName;
