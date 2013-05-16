@@ -1,5 +1,8 @@
 package com.rejasupotaro.hybridge.db;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import android.app.Application;
 import android.content.Context;
 import android.database.Cursor;
@@ -17,6 +20,7 @@ public class DbCache {
     private static Context sContext;
     private static DatabaseHelper sDatabaseHelper;
     private static final AsyncHttpClient sClient = new AsyncHttpClient();
+    private static Map<String, CacheContent> sCacheMap = new HashMap<String, CacheContent>();
 
     public static synchronized void initialize(Application application) {
         if (sIsInitialized) {
@@ -39,7 +43,7 @@ public class DbCache {
             if (c.moveToFirst()) {
                 do{
                     CacheContent cacheContent = new CacheContent(c);
-                    // TODO store on memory
+                    sCacheMap.put(cacheContent.getUrl(), cacheContent);
                 }while(c.moveToNext());
             }
         } finally {
