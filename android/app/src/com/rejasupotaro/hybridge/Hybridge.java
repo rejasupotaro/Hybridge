@@ -16,4 +16,8 @@ public class Hybridge {
     public static void preload(String url) {
         DbCache.preload(url);
     }
+
+    public static void drop(String url) {
+        // TODO impl me
+    }
 }

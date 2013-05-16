@@ -7,6 +7,7 @@ import android.util.Log;
 
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.rejasupotaro.hybridge.db.entity.CacheContent;
 import com.rejasupotaro.hybridge.utils.CloseableUtils;
 
 public class DbCache {
@@ -26,15 +27,24 @@ public class DbCache {
         sContext = application;
         sDatabaseHelper = new DatabaseHelper(sContext);
 
-        Cursor cursor = null;
-        try {
-            cursor = sDatabaseHelper.getAllContents();
-            Log.d("DEBUG", "count: " + cursor.getCount());
-        } finally {
-            CloseableUtils.close(cursor);
-        }
+        loadPreloadContents();
 
         sIsInitialized = true;
+    }
+
+    private static synchronized void loadPreloadContents() {
+        Cursor c = null;
+        try {
+            c = sDatabaseHelper.getAllContents();
+            if (c.moveToFirst()) {
+                do{
+                    CacheContent cacheContent = new CacheContent(c);
+                    // TODO store on memory
+                }while(c.moveToNext());
+            }
+        } finally {
+            CloseableUtils.close(c);
+        }
     }
 
     public static synchronized void dispose() {
