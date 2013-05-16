@@ -3,6 +3,7 @@ package com.rejasupotaro.hybridge;
 import android.app.Application;
 
 import com.rejasupotaro.hybridge.db.DbCache;
+import com.rejasupotaro.hybridge.utils.ExpiresTime;
 
 public class Hybridge {
     public static void initialize(Application application) {
@@ -13,11 +14,11 @@ public class Hybridge {
         DbCache.dispose();
     }
 
-    public static void preload(String url) {
-        DbCache.preload(url);
+    public static void preload(String url, ExpiresTime expires) {
+        DbCache.preload(url, expires);
     }
 
     public static void drop(String url) {
-        // TODO impl me
+        DbCache.drop(url);
     }
 }

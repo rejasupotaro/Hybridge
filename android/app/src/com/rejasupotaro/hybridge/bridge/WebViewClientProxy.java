@@ -3,7 +3,6 @@ package com.rejasupotaro.hybridge.bridge;
 import java.util.Map;
 
 import android.graphics.Bitmap;
-import android.net.Uri;
 import android.net.http.SslError;
 import android.os.Message;
 import android.view.KeyEvent;
@@ -12,6 +11,7 @@ import android.webkit.SslErrorHandler;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import com.rejasupotaro.hybridge.Hybridge;
 import com.rejasupotaro.hybridge.db.DbCache;
 import com.rejasupotaro.hybridge.db.entity.CacheContent;
 import com.rejasupotaro.hybridge.utils.UriUtils;
@@ -32,20 +32,22 @@ public class WebViewClientProxy extends WebViewClient {
     }
 
     public void onPageStarted(WebView view, String url, Bitmap favicon) {
-        Uri uri = Uri.parse(url);
+        if (!UriUtils.isValidDomain(url, allowingDomains)) {
+            throw new SecurityException("cannot load " + url); // FIXME define specific error
+        }
 
-        for (String allowingDomain : allowingDomains) {
-            if (!UriUtils.compareDomain(uri, allowingDomain)) {
-                throw new SecurityException("cannot load " + url); // FIXME define specific error
-            }
-            Map<String, CacheContent> cacheMap = DbCache.getContentMap();
-            if (cacheMap.containsKey(url)) {
-                CacheContent cacheContent = cacheMap.get(url);
-                loadFromCache(webView, cacheContent, url);
+        Map<String, CacheContent> cacheMap = DbCache.getContentMap();
+        String formattedUrl = UriUtils.deleteLastSlash(url);
+        if (cacheMap.containsKey(formattedUrl)) {
+            CacheContent cacheContent = cacheMap.get(formattedUrl);
+            if (!cacheContent.isExpired()) {
+                loadFromCache(webView, cacheContent, formattedUrl); // FIXME call to webViewClient
             } else {
-                webView.loadUrl(url);
+                Hybridge.drop(formattedUrl);
             }
         }
+
+        webViewClient.onPageStarted(view, formattedUrl, favicon);
     }
 
     private void loadFromCache(WebView webView, CacheContent cacheContent, String failUrl) {

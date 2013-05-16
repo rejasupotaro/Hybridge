@@ -12,6 +12,7 @@ import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.rejasupotaro.hybridge.db.entity.CacheContent;
 import com.rejasupotaro.hybridge.utils.CloseableUtils;
+import com.rejasupotaro.hybridge.utils.ExpiresTime;
 
 public class DbCache {
     private static final String TAG = DbCache.class.getName();
@@ -35,7 +36,7 @@ public class DbCache {
 
         sIsInitialized = true;
     }
-    
+
     public static Map<String, CacheContent> getContentMap() {
         return sCacheMap;
     }
@@ -60,12 +61,25 @@ public class DbCache {
         sIsInitialized = false;
     }
 
-    public static void preload(final String url) {
+    public static void preload(final String url, final ExpiresTime expires) {
         sClient.get(url, new AsyncHttpResponseHandler() {
             @Override
             public void onSuccess(String response) {
-                sDatabaseHelper.savePreloadContent(url, response);
+                sDatabaseHelper.savePreloadContent(url, response, expires);
+                loadPreloadContents();
+            }
+
+            @Override
+            public void onFailure(Throwable e, String response) {
+                // TODO impl me
             }
         });
+    }
+    
+    public static void drop(String url) {
+        sDatabaseHelper.deleteContent(url);
+        if (sCacheMap.containsKey(url)) {
+            sCacheMap.remove(url);
+        }
     }
 }

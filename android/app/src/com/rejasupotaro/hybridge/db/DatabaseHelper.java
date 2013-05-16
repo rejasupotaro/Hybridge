@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteStatement;
 
 import com.rejasupotaro.hybridge.db.entity.CacheContent;
+import com.rejasupotaro.hybridge.utils.ExpiresTime;
 import com.rejasupotaro.hybridge.utils.SQLiteUtils;
 import com.rejasupotaro.hybridge.utils.UriUtils;
 
@@ -51,21 +52,22 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
-    public void savePreloadContent(String url, String content) {
+    public void savePreloadContent(String url, String content, ExpiresTime expires) {
         String baseUrl = UriUtils.buildBaseUrl(url);
 
         SQLiteDatabase db = getWritableDatabase();
         SQLiteStatement statement = db.compileStatement(
                 "INSERT INTO " + CacheContent.getTableName() +
-                "(url, base_url, content, expires, mimetype, encoding) " +
-                "values (?, ?, ?, ?, ?, ?);");
+                "(url, base_url, content, expires, mimetype, encoding, created_at) " +
+                "values (?, ?, ?, ?, ?, ?, ?);");
 
         statement.bindString(1, url);
         statement.bindString(2, baseUrl);
         statement.bindString(3, content);
-        statement.bindLong(4, System.currentTimeMillis());
+        statement.bindLong(4, expires.getMillis());
         statement.bindString(5, "text/html"); // TODO enable to save images and scripts
         statement.bindString(6, "utf-8"); // TODO get encode from http client
+        statement.bindLong(7, System.currentTimeMillis()); // TODO get encode from http client
 
         statement.executeInsert();
     }
@@ -73,5 +75,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public Cursor getAllContents() {
         SQLiteDatabase db = getReadableDatabase();
         return db.rawQuery("SELECT * FROM " + CacheContent.getTableName() + ";", null);
+    }
+
+    public void deleteContent(String key) {
+        SQLiteDatabase db = getReadableDatabase();
+        db.delete(CacheContent.getTableName(), "url = ?", new String[]{key});
     }
 }

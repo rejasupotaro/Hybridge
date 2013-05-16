@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.os.Handler;
@@ -54,9 +53,7 @@ public class HybridgeWebView extends WebView {
     }
 
     @SuppressLint("SetJavaScriptEnabled")
-    public void init(Activity activity) {
-        registerBridge(activity);
-
+    public void init() {
         webSettings = getSettings();
         webSettings.setAppCacheEnabled(true);
         webSettings.setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
@@ -72,7 +69,7 @@ public class HybridgeWebView extends WebView {
         setScrollBarStyle(WebView.SCROLLBARS_INSIDE_OVERLAY);
     }
 
-    private void registerBridge(Object receiver) {
+    public void registerBridge(Object receiver) {
         Class<?> clazz = receiver.getClass();
         Method[] methods = clazz.getMethods();
         Map<String, Method> bridgeMethodSet = new HashMap<String, Method>();

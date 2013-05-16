@@ -20,6 +20,7 @@ public class CacheContent {
     @Column({"expires", "INTEGER"}) public long expires;
     @Column({"mimetype", "TEXT"}) public String mimetype;
     @Column({"encoding", "TEXT"}) public String encoding;
+    @Column({"created_at", "TEXT"}) public long createdAt;
 
     private static String sTableName;
 
@@ -33,6 +34,7 @@ public class CacheContent {
                 expires = c.getLong(c.getColumnIndex("expires"));
                 mimetype = c.getString(c.getColumnIndex("mimetype"));
                 encoding = c.getString(c.getColumnIndex("encoding"));
+                createdAt = c.getLong(c.getColumnIndex("created_at"));
             } while (c.moveToNext());
         }
     }
@@ -42,6 +44,9 @@ public class CacheContent {
     public String getContent() { return content; }
     public String getMimetype() { return mimetype; }
     public String getEncoding() { return encoding; }
+    public boolean isExpired() {
+        return expires + createdAt < System.currentTimeMillis();
+    }
 
     public static String getTableName() {
         if (sTableName != null) return sTableName;
