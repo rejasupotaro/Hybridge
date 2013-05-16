@@ -11,8 +11,8 @@ import com.rejasupotaro.hybridge.utils.SQLiteUtils;
 import com.rejasupotaro.hybridge.utils.UriUtils;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
-    public static final String DB_NAME = "hybridge_webview_cache";
-    public static final String TABLE_NAME = "prefetched_contents";
+    public static final String DB_NAME =  "com.rejasupotaro.hybridge.webview_cache";
+    public static final String TABLE_NAME = "preload_content";
     private static final int DB_VERSION = 1;
     private static final String QUERY_CREATE_TABLE = "CREATE TABLE " + TABLE_NAME + "(" +
             "_id INTEGER PRIMARY KEY," +
