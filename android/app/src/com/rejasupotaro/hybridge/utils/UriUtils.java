@@ -5,6 +5,14 @@ import android.net.Uri;
 public final class UriUtils {
     private UriUtils() {}
 
+    public static String buildBaseUrl(String urlString) {
+        Uri uri = Uri.parse(urlString);
+        String scheme = uri.getScheme();
+        String host = uri.getHost();
+        int port = uri.getPort();
+        return scheme + "://" + host + ((port == -1) ? "" : ":" + port);
+    }
+
     public static boolean compareDomain(Uri uri, String domain) {
         if (domain == null) {
             return false;

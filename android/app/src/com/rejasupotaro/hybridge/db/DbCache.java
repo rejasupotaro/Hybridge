@@ -2,16 +2,20 @@ package com.rejasupotaro.hybridge.db;
 
 import android.app.Application;
 import android.content.Context;
-import android.database.sqlite.SQLiteDatabase;
+import android.database.Cursor;
 import android.util.Log;
 
-import com.rejasupotaro.hybridge.Hybridge;
+import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.rejasupotaro.hybridge.utils.CloseableUtils;
 
 public class DbCache {
-    private static final String TAG = Hybridge.class.getSimpleName();
+    private static final String TAG = DbCache.class.getName();
+
     private static boolean sIsInitialized = false;
     private static Context sContext;
     private static DatabaseHelper sDatabaseHelper;
+    private static final AsyncHttpClient sClient = new AsyncHttpClient();
 
     public static synchronized void initialize(Application application) {
         if (sIsInitialized) {
@@ -21,22 +25,29 @@ public class DbCache {
 
         sContext = application;
         sDatabaseHelper = new DatabaseHelper(sContext);
-        openDatabase();
+
+        Cursor cursor = null;
+        try {
+            cursor = sDatabaseHelper.getAllContents();
+            Log.d("DEBUG", "count: " + cursor.getCount());
+        } finally {
+            CloseableUtils.close(cursor);
+        }
 
         sIsInitialized = true;
     }
 
     public static synchronized void dispose() {
-        closeDatabase();
         sDatabaseHelper = null;
         sIsInitialized = false;
     }
 
-    public static synchronized SQLiteDatabase openDatabase() {
-        return sDatabaseHelper.getWritableDatabase();
-    }
-
-    public static synchronized void closeDatabase() {
-        sDatabaseHelper.close();
+    public static void preload(final String url) {
+        sClient.get(url, new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(String response) {
+                sDatabaseHelper.savePreloadContent(url, response);
+            }
+        });
     }
 }

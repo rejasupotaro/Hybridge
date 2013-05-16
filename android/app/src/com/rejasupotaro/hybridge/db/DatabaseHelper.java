@@ -1,19 +1,23 @@
 package com.rejasupotaro.hybridge.db;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import com.rejasupotaro.hybridge.utils.SQLiteUtils;
+import com.rejasupotaro.hybridge.utils.UriUtils;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
-    private static final String DB_NAME = "hybridge_webview_cache";
+    public static final String DB_NAME = "hybridge_webview_cache";
+    public static final String TABLE_NAME = "prefetched_contents";
     private static final int DB_VERSION = 1;
-    private static final String TABLE_NAME = "prefetched_contents";
     private static final String QUERY_CREATE_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + "(" +
             "_id INTEGER PRIMARY KEY," +
             "url TEXT," +
-            "base_url TEXT," + 
+            "base_url TEXT," +
+            "content TEXT" +
             "lastmodify TEXT," +
             "expires INTEGER," +
             "mimetype TEXT," +
@@ -27,11 +31,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onOpen(SQLiteDatabase db) {
+        Log.d("DEBUG", "onOpen");
         executePragmas(db);
     };
 
     @Override
     public void onCreate(SQLiteDatabase db) {
+        Log.d("DEBUG", "onCreate");
         executePragmas(db);
         executeCreate(db);
     }
@@ -57,5 +63,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         finally {
             db.endTransaction();
         }
+    }
+
+    public void savePreloadContent(String url, String content) {
+        String baseUrl = UriUtils.buildBaseUrl(url);
+        Log.d("DEBUG", baseUrl);
+    }
+
+    public Cursor getAllContents() {
+        SQLiteDatabase db = getReadableDatabase();
+        return db.rawQuery("SELECT * FROM " + DatabaseHelper.TABLE_NAME + ";", null);
     }
 }
