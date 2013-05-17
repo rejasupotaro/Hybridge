@@ -18,7 +18,7 @@ import com.rejasupotaro.hybridge.R;
 import com.rejasupotaro.hybridge.annotation.Bridge;
 
 public class HybridgeWebView extends WebView {
-    private static final String DEFAULT_JAVASCRIPT_INTERFACE_NAME = "Device";
+    private static final String DEFAULT_JAVASCRIPT_INTERFACE_NAME = "DeviceBridge";
 
     private String javascriptInterfaceName = DEFAULT_JAVASCRIPT_INTERFACE_NAME;
     private WebSettings webSettings;
