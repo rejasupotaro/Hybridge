@@ -21,4 +21,6 @@ public class Hybridge {
     public static void drop(String url) {
         DbCache.drop(url);
     }
+
+    // TODO impl setUserAgent method
 }

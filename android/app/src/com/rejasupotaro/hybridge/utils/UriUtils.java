@@ -5,9 +5,9 @@ import android.net.Uri;
 public final class UriUtils {
     private UriUtils() {}
 
-    public static String deleteLastSlash(String url) {
-        if (url.endsWith("/")) {
-            return url.substring(0, url.length() - 1);
+    public static String appendSlashIfNecessary(String url) {
+        if (!url.endsWith("/")) {
+            return url + "/";
         }
         return url;
     }
@@ -25,7 +25,7 @@ public final class UriUtils {
     }
 
     public static boolean isValidDomain(Uri uri, String[] allowingDomains) {
-        boolean isValid = false;
+        boolean isValid = true;
         for (String allowingDomain : allowingDomains) {
             if (UriUtils.compareDomain(uri, allowingDomain)) {
                 isValid = true;

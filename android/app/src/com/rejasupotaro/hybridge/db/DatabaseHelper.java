@@ -1,10 +1,13 @@
 package com.rejasupotaro.hybridge.db;
 
+import org.apache.http.protocol.HTTP;
+
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteStatement;
+import android.util.Log;
 
 import com.rejasupotaro.hybridge.db.entity.CacheContent;
 import com.rejasupotaro.hybridge.utils.ExpiresTime;
@@ -66,10 +69,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         statement.bindString(3, content);
         statement.bindLong(4, expires.getMillis());
         statement.bindString(5, "text/html"); // TODO enable to save images and scripts
-        statement.bindString(6, "utf-8"); // TODO get encode from http client
+        statement.bindString(6, HTTP.UTF_8); // TODO get encode from http client
         statement.bindLong(7, System.currentTimeMillis()); // TODO get encode from http client
 
         statement.executeInsert();
+        Log.d("DEBUG", "statement: " + statement.toString());
     }
 
     public Cursor getAllContents() {

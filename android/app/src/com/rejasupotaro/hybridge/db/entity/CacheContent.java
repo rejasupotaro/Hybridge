@@ -27,7 +27,7 @@ public class CacheContent {
     public CacheContent(Cursor c) {
         if (c.moveToFirst()) {
             do {
-                // FIXME don't hard coding
+                // FIXME don't hard code
                 url = c.getString(c.getColumnIndex("url"));
                 baseUrl = c.getString(c.getColumnIndex("base_url"));
                 content = c.getString(c.getColumnIndex("content"));
