@@ -9,7 +9,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteStatement;
 import android.util.Log;
 
-import com.rejasupotaro.hybridge.db.entity.CacheContent;
+import com.rejasupotaro.hybridge.db.entity.PreloadedContent;
 import com.rejasupotaro.hybridge.utils.ExpiresTime;
 import com.rejasupotaro.hybridge.utils.SQLiteUtils;
 import com.rejasupotaro.hybridge.utils.UriUtils;
@@ -48,7 +48,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private void executeCreate(SQLiteDatabase db) {
         db.beginTransaction();
         try {
-            db.execSQL(CacheContent.toQuery());
+            db.execSQL(PreloadedContent.toQuery());
             db.setTransactionSuccessful();
         } finally {
             db.endTransaction();
@@ -60,7 +60,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         SQLiteDatabase db = getWritableDatabase();
         SQLiteStatement statement = db.compileStatement(
-                "INSERT INTO " + CacheContent.getTableName() +
+                "INSERT INTO " + PreloadedContent.getTableName() +
                 "(url, base_url, content, expires, mimetype, encoding, created_at) " +
                 "values (?, ?, ?, ?, ?, ?, ?);");
 
@@ -78,11 +78,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public Cursor getAllContents() {
         SQLiteDatabase db = getReadableDatabase();
-        return db.rawQuery("SELECT * FROM " + CacheContent.getTableName() + ";", null);
+        return db.rawQuery("SELECT * FROM " + PreloadedContent.getTableName() + ";", null);
     }
 
     public void deleteContent(String key) {
         SQLiteDatabase db = getReadableDatabase();
-        db.delete(CacheContent.getTableName(), "url = ?", new String[]{key});
+        db.delete(PreloadedContent.getTableName(), "url = ?", new String[]{key});
     }
 }

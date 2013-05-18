@@ -20,14 +20,14 @@ public final class UriUtils {
         return scheme + "://" + host + ((port == -1) ? "" : ":" + port);
     }
 
-    public static boolean isValidDomain(String urlString, String[] allowingDomains) {
-        return isValidDomain(Uri.parse(urlString), allowingDomains);
+    public static boolean isValidDomain(String urlString, String[] validDomains) {
+        return isValidDomain(Uri.parse(urlString), validDomains);
     }
 
-    public static boolean isValidDomain(Uri uri, String[] allowingDomains) {
+    public static boolean isValidDomain(Uri uri, String[] validDomains) {
         boolean isValid = true;
-        for (String allowingDomain : allowingDomains) {
-            if (UriUtils.compareDomain(uri, allowingDomain)) {
+        for (String validDomain : validDomains) {
+            if (UriUtils.compareDomain(uri, validDomain)) {
                 isValid = true;
             }
         }

@@ -9,8 +9,8 @@ import com.rejasupotaro.hybridge.annotation.Column;
 import com.rejasupotaro.hybridge.annotation.Table;
 
 @Table("preload_content")
-public class CacheContent {
-    private static final String TAG = CacheContent.class.getName();
+public class PreloadedContent {
+    private static final String TAG = PreloadedContent.class.getName();
 
     // FIXME define table schema more simply
     @Column({"_id", "INTEGER PRIMARY KEY"}) public long id;
@@ -24,7 +24,10 @@ public class CacheContent {
 
     private static String sTableName;
 
-    public CacheContent(Cursor c) {
+    @SuppressWarnings("unused")
+    private PreloadedContent() {}
+
+    public PreloadedContent(Cursor c) {
         if (c.moveToFirst()) {
             do {
                 // FIXME don't hard code
@@ -51,7 +54,7 @@ public class CacheContent {
     public static String getTableName() {
         if (sTableName != null) return sTableName;
 
-        Table table = (Table) CacheContent.class.getAnnotation(Table.class);
+        Table table = (Table) PreloadedContent.class.getAnnotation(Table.class);
         if (table == null) throw new RuntimeException("FIXME"); // FIXME define specific exception
 
         sTableName = table.value();
@@ -62,7 +65,7 @@ public class CacheContent {
         StringBuffer stringBuffer = new StringBuffer();
         try {
             stringBuffer.append("CREATE TABLE ").append(getTableName()).append("(");
-            Field[] fields = CacheContent.class.getDeclaredFields();
+            Field[] fields = PreloadedContent.class.getDeclaredFields();
             for (Field field : fields) {
                 field.setAccessible(true);
 

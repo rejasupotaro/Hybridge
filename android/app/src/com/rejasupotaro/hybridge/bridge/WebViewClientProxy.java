@@ -14,20 +14,20 @@ import android.webkit.WebViewClient;
 
 import com.rejasupotaro.hybridge.Hybridge;
 import com.rejasupotaro.hybridge.db.DbCache;
-import com.rejasupotaro.hybridge.db.entity.CacheContent;
+import com.rejasupotaro.hybridge.db.entity.PreloadedContent;
 import com.rejasupotaro.hybridge.utils.UriUtils;
 
 public class WebViewClientProxy extends WebViewClient {
     private HybridgeWebView webView;
     private WebViewClient webViewClient;
-    private String[] allowingDomains;
+    private String[] validDomains;
 
     private long measureStartMillis; // for measuring loading time
 
-    public WebViewClientProxy(HybridgeWebView webView, WebViewClient webViewClient, String[] allowingDomains) {
+    public WebViewClientProxy(HybridgeWebView webView, WebViewClient webViewClient, String[] validDomains) {
         this.webView = webView;
         this.webViewClient = webViewClient;
-        this.allowingDomains = allowingDomains;
+        this.validDomains = validDomains;
     }
 
     @Override
@@ -38,14 +38,14 @@ public class WebViewClientProxy extends WebViewClient {
     @Override
     public void onPageStarted(WebView view, String url, Bitmap favicon) {
         measureStartMillis = System.currentTimeMillis(); // for measuring loading time
-        if (!UriUtils.isValidDomain(url, allowingDomains)) {
+        if (!UriUtils.isValidDomain(url, validDomains)) {
             throw new SecurityException("cannot load " + url); // FIXME define specific error
         }
 
         String formattedUrl = UriUtils.appendSlashIfNecessary(url);
-        Map<String, CacheContent> cacheMap = DbCache.getContentMap();
+        Map<String, PreloadedContent> cacheMap = DbCache.getContentMap();
         if (cacheMap.containsKey(formattedUrl)) {
-            CacheContent cacheContent = cacheMap.get(formattedUrl);
+            PreloadedContent cacheContent = cacheMap.get(formattedUrl);
             if (!cacheContent.isExpired()) {
                 loadFromCache(webView, cacheContent, formattedUrl);
                 // FIXME call webViewClient method
@@ -58,7 +58,7 @@ public class WebViewClientProxy extends WebViewClient {
         }
     }
 
-    private void loadFromCache(WebView webView, CacheContent cacheContent, String failUrl) {
+    private void loadFromCache(WebView webView, PreloadedContent cacheContent, String failUrl) {
         webView.loadDataWithBaseURL(
                 cacheContent.getBaseUrl(),
                 cacheContent.getContent(),

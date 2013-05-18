@@ -22,7 +22,7 @@ public class HybridgeWebView extends WebView {
 
     private String javascriptInterfaceName = DEFAULT_JAVASCRIPT_INTERFACE_NAME;
     private WebSettings webSettings;
-    private String[] allowingDomains;
+    private String[] validDomains;
     private DeviceBridgeProxy deviceBridgeProxy;
 
     public HybridgeWebView(Context context) {
@@ -45,9 +45,9 @@ public class HybridgeWebView extends WebView {
             javascriptInterfaceName = jsiName;
         }
 
-        allowingDomains =
-                typedArray.getString(R.styleable.HybridgeWebView_allowingDomains).split(" ");
-        if (allowingDomains == null) throw new SecurityException("Don't use HybridgeWebView without setting domains");
+        validDomains =
+                typedArray.getString(R.styleable.HybridgeWebView_validDomains).split(" ");
+        if (validDomains == null) throw new SecurityException("Don't use HybridgeWebView without setting domains");
 
         typedArray.recycle();
     }
@@ -89,7 +89,7 @@ public class HybridgeWebView extends WebView {
 
     @Override
     public void setWebViewClient(WebViewClient webViewClient) {
-        super.setWebViewClient(new WebViewClientProxy(this, webViewClient, allowingDomains));
+        super.setWebViewClient(new WebViewClientProxy(this, webViewClient, validDomains));
     }
 
     public boolean browserBack() {

@@ -3,7 +3,7 @@
 
     <declare-styleable name="HybridgeWebView">
         <attr name="javascriptInterfaceName" format="string" />
-        <attr name="allowingDomains" format="string" />
+        <attr name="validDomains" format="string" />
     </declare-styleable>
 
 </resources>

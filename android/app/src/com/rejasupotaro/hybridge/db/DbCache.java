@@ -10,7 +10,7 @@ import android.util.Log;
 
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
-import com.rejasupotaro.hybridge.db.entity.CacheContent;
+import com.rejasupotaro.hybridge.db.entity.PreloadedContent;
 import com.rejasupotaro.hybridge.utils.ExpiresTime;
 import com.rejasupotaro.hybridge.utils.UriUtils;
 
@@ -21,7 +21,7 @@ public class DbCache {
     private static Context sContext;
     private static DatabaseHelper sDatabaseHelper;
     private static final AsyncHttpClient sClient = new AsyncHttpClient();
-    private static Map<String, CacheContent> sCacheMap = new HashMap<String, CacheContent>();
+    private static Map<String, PreloadedContent> sCacheMap = new HashMap<String, PreloadedContent>();
 
     public static synchronized void initialize(Application application) {
         if (sIsInitialized) {
@@ -32,22 +32,22 @@ public class DbCache {
         sContext = application;
         sDatabaseHelper = new DatabaseHelper(sContext);
 
-        loadPreloadContents();
+        loadPreloadedContents();
 
         sIsInitialized = true;
     }
 
-    public static Map<String, CacheContent> getContentMap() {
+    public static Map<String, PreloadedContent> getContentMap() {
         return sCacheMap;
     }
 
-    private static synchronized void loadPreloadContents() {
+    private static synchronized void loadPreloadedContents() {
         Cursor c = null;
         try {
             c = sDatabaseHelper.getAllContents();
             if (c.moveToFirst()) {
                 do {
-                    CacheContent cacheContent = new CacheContent(c);
+                    PreloadedContent cacheContent = new PreloadedContent(c);
                     sCacheMap.put(cacheContent.getUrl(), cacheContent);
                 } while (c.moveToNext());
             }
@@ -67,7 +67,7 @@ public class DbCache {
             @Override
             public void onSuccess(String response) {
                 sDatabaseHelper.savePreloadContent(formattedUrl, response, expires);
-                loadPreloadContents();
+                loadPreloadedContents();
             }
 
             @Override
