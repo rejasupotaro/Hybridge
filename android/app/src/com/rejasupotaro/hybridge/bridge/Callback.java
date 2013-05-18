@@ -1,6 +1,7 @@
 package com.rejasupotaro.hybridge.bridge;
 
+import org.json.JSONObject;
+
 public interface Callback {
-    //public void succeed(WebViewBridge bridge, String result);
-    //public void fail(WebViewBridge bridge, String code, String msg);
+    public void invoke(JSONObject json);
 }

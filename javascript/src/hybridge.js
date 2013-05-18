@@ -26,11 +26,9 @@
 
         this.notifyToDevice(request, callback);
       },
-      getId: function() {
-        var id = HYBRIDGE_ID_PREFIX + self.idsCount;
-        self.ids[id] = true;
-        self.idsCount++;
-        return id;
+      regist: function(dest, observer) {
+        if (!dest && !observer) return;
+        self.observerTable[dest] = observer;
       },
       notifyToDevice: function(request, callback) {
         var requestJson = JSON.stringify(request);
@@ -44,41 +42,43 @@
           // TODO stack request from web
         }
       },
+      returnToDevice: function(response) {
+        var responseJson = JSON.stringify(response);
+        alert(response.id);
+        if (this.existsDeviceBridge()) {
+          window.DeviceBridge.returnToDevice(encodeURIComponent(responseJson));
+        }
+      },
+      notifyToWeb: function(notify) {
+        json = JSON.parse(decodeURIComponent(notify));
+        var observer = self.observerTable[json.dest];
+        if (!!observer) return; // TODO error handling
+
+        var result = observer(json);
+        if (!!json.id) return;
+
+        var response = {
+          'id': json.id,
+          'dest': json.dest,
+          'result': result
+        }
+
+        this.returnToDevice(response);
+      },
+      returnToWeb: function(notify) {
+        json = JSON.parse(decodeURIComponent(notify));
+        var callback = self.callbackTable[json.id];
+        if (callback) callback(json);
+        delete self.callbackTable[json.id];
+      },
+      getId: function() {
+        var id = HYBRIDGE_ID_PREFIX + self.idsCount;
+        self.ids[id] = true;
+        self.idsCount++;
+        return id;
+      },
       existsDeviceBridge: function() {
         return !!(window.DeviceBridge);
-      },
-      notifyToWeb: function() {
-        var json = {};
-        try {
-          json = JSON.parse(decodeURIComponent(notify));
-        } catch (e) {
-          // TODO notify error to device
-        }
-
-        if (this.isRequestNotify(json)) {
-          var observers = self.observerTable[json.dest];
-          if (observers) {
-            for (var i = 0; i < observers.length; i++) {
-              var observer = observers[i];
-              this.observer(json);
-            }
-          }
-        } else {
-          var callback = self.callbackTable[json.id];
-          if (callback) callback(json);
-          delete self.callbackTable[json.id];
-        }
-      },
-      isRequestNotify: function(notify) {
-        return (notify && notify.hasOwnProperty('params')) ? true : false;
-      },
-      observe: function(dest, observer) {
-        if (!dest && !observer) return;
-
-        if (!self.observerTable[dest]) {
-          self.observerTable[dest] = [];
-        }
-        self.observer[dest].push(observer);
       }
     };
 

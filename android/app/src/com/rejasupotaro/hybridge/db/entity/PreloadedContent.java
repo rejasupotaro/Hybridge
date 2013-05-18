@@ -55,7 +55,7 @@ public class PreloadedContent {
         if (sTableName != null) return sTableName;
 
         Table table = (Table) PreloadedContent.class.getAnnotation(Table.class);
-        if (table == null) throw new RuntimeException("FIXME"); // FIXME define specific exception
+        if (table == null) throw new IllegalStateException();
 
         sTableName = table.value();
         return sTableName;

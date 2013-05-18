@@ -3,7 +3,7 @@ package com.rejasupotaro.hybridge;
 import android.app.Application;
 
 import com.rejasupotaro.hybridge.db.DbCache;
-import com.rejasupotaro.hybridge.utils.ExpiresTime;
+import com.rejasupotaro.hybridge.db.ExpiresTime;
 
 public class Hybridge {
     public static void initialize(Application application) {

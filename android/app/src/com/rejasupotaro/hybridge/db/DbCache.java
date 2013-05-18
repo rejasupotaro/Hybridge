@@ -11,7 +11,6 @@ import android.util.Log;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.rejasupotaro.hybridge.db.entity.PreloadedContent;
-import com.rejasupotaro.hybridge.utils.ExpiresTime;
 import com.rejasupotaro.hybridge.utils.UriUtils;
 
 public class DbCache {
@@ -21,7 +20,7 @@ public class DbCache {
     private static Context sContext;
     private static DatabaseHelper sDatabaseHelper;
     private static final AsyncHttpClient sClient = new AsyncHttpClient();
-    private static Map<String, PreloadedContent> sCacheMap = new HashMap<String, PreloadedContent>();
+    private static Map<String, PreloadedContent> sContentCacheMap = new HashMap<String, PreloadedContent>();
 
     public static synchronized void initialize(Application application) {
         if (sIsInitialized) {
@@ -37,18 +36,18 @@ public class DbCache {
         sIsInitialized = true;
     }
 
-    public static Map<String, PreloadedContent> getContentMap() {
-        return sCacheMap;
+    public static Map<String, PreloadedContent> getContentCacheMap() {
+        return sContentCacheMap;
     }
 
-    private static synchronized void loadPreloadedContents() {
+    private static void loadPreloadedContents() {
         Cursor c = null;
         try {
             c = sDatabaseHelper.getAllContents();
             if (c.moveToFirst()) {
                 do {
                     PreloadedContent cacheContent = new PreloadedContent(c);
-                    sCacheMap.put(cacheContent.getUrl(), cacheContent);
+                    sContentCacheMap.put(cacheContent.getUrl(), cacheContent);
                 } while (c.moveToNext());
             }
         } finally {
@@ -56,7 +55,7 @@ public class DbCache {
         }
     }
 
-    public static synchronized void dispose() {
+    public static void dispose() {
         sDatabaseHelper = null;
         sIsInitialized = false;
     }
@@ -67,7 +66,8 @@ public class DbCache {
             @Override
             public void onSuccess(String response) {
                 sDatabaseHelper.savePreloadContent(formattedUrl, response, expires);
-                loadPreloadedContents();
+                Cursor c = sDatabaseHelper.getPreloadedContent(formattedUrl);
+                sContentCacheMap.put(formattedUrl, new PreloadedContent(c));
             }
 
             @Override
@@ -79,8 +79,8 @@ public class DbCache {
 
     public static void drop(String url) {
         sDatabaseHelper.deleteContent(url);
-        if (sCacheMap.containsKey(url)) {
-            sCacheMap.remove(url);
+        if (sContentCacheMap.containsKey(url)) {
+            sContentCacheMap.remove(url);
         }
     }
 }

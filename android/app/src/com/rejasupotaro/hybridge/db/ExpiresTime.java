@@ -1,4 +1,4 @@
-package com.rejasupotaro.hybridge.utils;
+package com.rejasupotaro.hybridge.db;
 
 public enum ExpiresTime {
     ONE_DAY(86340000),

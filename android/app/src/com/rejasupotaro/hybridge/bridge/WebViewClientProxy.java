@@ -2,6 +2,8 @@ package com.rejasupotaro.hybridge.bridge;
 
 import java.util.Map;
 
+import org.apache.http.protocol.HTTP;
+
 import android.graphics.Bitmap;
 import android.net.http.SslError;
 import android.os.Message;
@@ -21,6 +23,7 @@ public class WebViewClientProxy extends WebViewClient {
     private HybridgeWebView webView;
     private WebViewClient webViewClient;
     private String[] validDomains;
+    private boolean isErrorOccredDuringLoadUrl = false;
 
     private long measureStartMillis; // for measuring loading time
 
@@ -28,6 +31,10 @@ public class WebViewClientProxy extends WebViewClient {
         this.webView = webView;
         this.webViewClient = webViewClient;
         this.validDomains = validDomains;
+    }
+
+    public boolean isErrorOccred() {
+        return isErrorOccredDuringLoadUrl;
     }
 
     @Override
@@ -38,12 +45,20 @@ public class WebViewClientProxy extends WebViewClient {
     @Override
     public void onPageStarted(WebView view, String url, Bitmap favicon) {
         measureStartMillis = System.currentTimeMillis(); // for measuring loading time
+
+        isErrorOccredDuringLoadUrl = false;
+
         if (!UriUtils.isValidDomain(url, validDomains)) {
-            throw new SecurityException("cannot load " + url); // FIXME define specific error
+            // FIXME define specific error
+            throw new SecurityException("cannot load " + url);
+
+            // or launch browser. ex
+            //Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+            //startActivity(intent);
         }
 
         String formattedUrl = UriUtils.appendSlashIfNecessary(url);
-        Map<String, PreloadedContent> cacheMap = DbCache.getContentMap();
+        Map<String, PreloadedContent> cacheMap = DbCache.getContentCacheMap();
         if (cacheMap.containsKey(formattedUrl)) {
             PreloadedContent cacheContent = cacheMap.get(formattedUrl);
             if (!cacheContent.isExpired()) {
@@ -68,6 +83,17 @@ public class WebViewClientProxy extends WebViewClient {
     }
 
     @Override
+    public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
+        isErrorOccredDuringLoadUrl = true;
+
+        webView.loadData(
+                "error occured during load " + failingUrl + " : " + description,
+                HTTP.PLAIN_TEXT_TYPE,
+                HTTP.UTF_8);
+        webViewClient.onReceivedError(view, errorCode, description, failingUrl);
+    }
+
+    @Override
     public void onPageFinished(WebView view, String url) {
         // for measuring loading time
         Log.d("DEBUG", url + " : " + String.valueOf(System.currentTimeMillis() - measureStartMillis));
@@ -85,11 +111,6 @@ public class WebViewClientProxy extends WebViewClient {
     @Override
     public void onTooManyRedirects(WebView view, Message cancelMsg, Message continueMsg) {
         webViewClient.onTooManyRedirects(view, cancelMsg, continueMsg);
-    }
-
-    @Override
-    public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
-        webViewClient.onReceivedError(view, errorCode, description, failingUrl);
     }
 
     @Override

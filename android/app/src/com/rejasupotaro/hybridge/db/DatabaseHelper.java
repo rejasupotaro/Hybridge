@@ -10,7 +10,6 @@ import android.database.sqlite.SQLiteStatement;
 import android.util.Log;
 
 import com.rejasupotaro.hybridge.db.entity.PreloadedContent;
-import com.rejasupotaro.hybridge.utils.ExpiresTime;
 import com.rejasupotaro.hybridge.utils.SQLiteUtils;
 import com.rejasupotaro.hybridge.utils.UriUtils;
 
@@ -79,6 +78,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public Cursor getAllContents() {
         SQLiteDatabase db = getReadableDatabase();
         return db.rawQuery("SELECT * FROM " + PreloadedContent.getTableName() + ";", null);
+    }
+
+    public Cursor getPreloadedContent(String url) {
+        SQLiteDatabase db = getReadableDatabase();
+        return db.rawQuery("SELECT * FROM " + PreloadedContent.getTableName() + " where url=?;", new String[]{url});
     }
 
     public void deleteContent(String key) {

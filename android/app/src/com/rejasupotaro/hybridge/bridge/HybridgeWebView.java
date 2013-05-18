@@ -4,6 +4,8 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.json.JSONObject;
+
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -27,16 +29,19 @@ public class HybridgeWebView extends WebView {
 
     public HybridgeWebView(Context context) {
         super(context);
+        setup();
     }
 
     public HybridgeWebView(Context context, AttributeSet attrs) {
         super(context, attrs);
         readAttributes(context.obtainStyledAttributes(attrs, R.styleable.HybridgeWebView));
+        setup();
     }
 
     public HybridgeWebView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         readAttributes(context.obtainStyledAttributes(attrs, R.styleable.HybridgeWebView, defStyle, 0));
+        setup();
     }
 
     private void readAttributes(TypedArray typedArray) {
@@ -53,7 +58,7 @@ public class HybridgeWebView extends WebView {
     }
 
     @SuppressLint("SetJavaScriptEnabled")
-    public void init() {
+    private void setup() {
         webSettings = getSettings();
         webSettings.setAppCacheEnabled(true);
         webSettings.setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
@@ -92,18 +97,19 @@ public class HybridgeWebView extends WebView {
         super.setWebViewClient(new WebViewClientProxy(this, webViewClient, validDomains));
     }
 
-    public boolean browserBack() {
+    public boolean historyBack() {
         if (canGoBack()) {
             goBack();
             return true;
         }
         return false;
     }
-    
-    public void call(String jsMethodName, String... args) {
-        call(null, jsMethodName, args);
+
+    public void call(String dest, JSONObject params) {
+        deviceBridgeProxy.notifyToWeb(dest, params);
     }
 
-    public void call( Callback callback, String jsMethodName, String... args) {
+    public void call(String dest, JSONObject params, Callback callback) {
+        deviceBridgeProxy.notifyToWeb(dest, params, callback);
     }
 }
