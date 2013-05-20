@@ -79,7 +79,7 @@ hybridge.call(
 hybridge.register(
     'greet.method.name',
     function(json) {
-      alert("Hello" + json.param);
+      alert("Hello" + json.params.name);
       return "Enjoy development!";
     });
 ```
