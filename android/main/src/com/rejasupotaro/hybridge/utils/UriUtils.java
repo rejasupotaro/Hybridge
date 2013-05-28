@@ -25,7 +25,7 @@ public final class UriUtils {
     }
 
     public static boolean isValidDomain(Uri uri, String[] validDomains) {
-        boolean isValid = true;
+        boolean isValid = false;
         for (String validDomain : validDomains) {
             if (UriUtils.compareDomain(uri, validDomain)) {
                 isValid = true;

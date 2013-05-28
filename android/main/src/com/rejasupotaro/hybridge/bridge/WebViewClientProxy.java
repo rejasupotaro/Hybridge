@@ -17,6 +17,7 @@ import android.webkit.WebViewClient;
 import com.rejasupotaro.hybridge.Hybridge;
 import com.rejasupotaro.hybridge.db.DbCache;
 import com.rejasupotaro.hybridge.db.entity.PreloadedContent;
+import com.rejasupotaro.hybridge.exception.LoadInvalidDomainUrlException;
 import com.rejasupotaro.hybridge.utils.UriUtils;
 
 public class WebViewClientProxy extends WebViewClient {
@@ -50,7 +51,7 @@ public class WebViewClientProxy extends WebViewClient {
 
         if (!UriUtils.isValidDomain(url, validDomains)) {
             // FIXME define specific error
-            throw new SecurityException("cannot load " + url);
+            throw new LoadInvalidDomainUrlException("cannot load " + url);
 
             // or launch browser. ex
             //Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));

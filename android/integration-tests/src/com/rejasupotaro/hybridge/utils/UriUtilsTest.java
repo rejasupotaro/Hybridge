@@ -10,12 +10,12 @@ public class UriUtilsTest extends AndroidTestCase {
     }
 
     public void testBuildBaseUrl() {
-        assertEquals("http://rejasupotaro.com/", UriUtils.buildBaseUrl("http://rejasupotaro.com/images/1"));
-        assertEquals("http://rejasupotaro.com/", UriUtils.buildBaseUrl("http://rejasupotaro.com"));
+        assertEquals("http://rejasupotaro.com", UriUtils.buildBaseUrl("http://rejasupotaro.com/images/1"));
+        assertEquals("http://rejasupotaro.com", UriUtils.buildBaseUrl("http://rejasupotaro.com"));
     }
 
     public void testIsValidDomain() {
-        String[] validDomains = new String[]{"rejasupotaro.com", "rejamotion.com"};
+        String[] validDomains = new String[]{"rejasupotaro.com/", "rejamotion.com"};
         assertTrue(UriUtils.isValidDomain("http://rejasupotaro.com/images/1", validDomains));
         assertTrue(UriUtils.isValidDomain("http://rejamotion.com/images/2", validDomains));
         assertFalse(UriUtils.isValidDomain("http://reja.com/images/3", validDomains));

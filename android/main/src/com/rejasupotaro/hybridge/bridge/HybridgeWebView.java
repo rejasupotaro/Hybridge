@@ -18,6 +18,7 @@ import android.webkit.WebViewClient;
 
 import com.rejasupotaro.hybridge.R;
 import com.rejasupotaro.hybridge.annotation.Bridge;
+import com.rejasupotaro.hybridge.exception.LoadInvalidDomainUrlException;
 
 public class HybridgeWebView extends WebView {
     private static final String DEFAULT_JAVASCRIPT_INTERFACE_NAME = "DeviceBridge";
@@ -52,7 +53,9 @@ public class HybridgeWebView extends WebView {
 
         validDomains =
                 typedArray.getString(R.styleable.HybridgeWebView_validDomains).split(" ");
-        if (validDomains == null) throw new SecurityException("Don't use HybridgeWebView without setting domains");
+        if (validDomains == null) {
+            throw new LoadInvalidDomainUrlException("Don't use HybridgeWebView without setting domains");
+        }
 
         typedArray.recycle();
     }
